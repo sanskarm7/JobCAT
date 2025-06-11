@@ -125,7 +125,11 @@ export class JobService {
     );
 
     // Get the job with company info
-    return this.findById(result.rows[0].id)!;
+    const job = await this.findById(result.rows[0].id);
+    if (!job) {
+      throw new Error('Failed to create job');
+    }
+    return job;
   }
 
   async update(id: string, updates: Partial<Omit<Job, 'id' | 'companyId' | 'createdAt' | 'updatedAt' | 'company'>>): Promise<Job | null> {

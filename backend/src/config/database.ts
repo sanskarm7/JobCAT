@@ -18,7 +18,7 @@ pool.on('error', (err) => {
   process.exit(-1);
 });
 
-class Database {
+export class Database {
   private pool: Pool;
 
   constructor() {
@@ -39,7 +39,7 @@ class Database {
     return this.pool.connect();
   }
 
-  async close(): Promise<void> {
+  async disconnect(): Promise<void> {
     await this.pool.end();
   }
 }

@@ -6,14 +6,17 @@ describe('Company API', () => {
   let token: string;
 
   beforeAll(async () => {
-    // Setup test user and get token
-    const response = await request(app)
-      .post('/api/auth/login')
+    // Create test user first
+    const registerResponse = await request(app)
+      .post('/api/auth/register')
       .send({
-        email: 'test@example.com',
-        password: 'password123'
+        email: `test-company${Date.now()}@example.com`,
+        password: 'password123',
+        firstName: 'Test',
+        lastName: 'User'
       });
-    token = response.body.accessToken;
+    
+    token = registerResponse.body.accessToken;
   });
 
   it('should create a new company', async () => {

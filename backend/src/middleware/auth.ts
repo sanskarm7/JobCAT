@@ -23,7 +23,7 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
     // Verify user still exists
     const result = await db.query(
       'SELECT id, email FROM users WHERE id = $1',
-      [decoded.sub]
+      [decoded.userId]
     );
 
     if (result.rows.length === 0) {

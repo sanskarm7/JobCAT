@@ -59,8 +59,11 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  logger.info(`Backend server running on http://localhost:${PORT}`);
-});
+// Only start the server if we're not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    logger.info(`Backend server running on http://localhost:${PORT}`);
+  });
+}
 
 export default app; 

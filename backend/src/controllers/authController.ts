@@ -39,9 +39,9 @@ router.post('/register', async (req: Request, res: Response, next) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { sub: user.id, email: user.email },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      { userId: user.id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '24h' }
     );
 
     res.status(201).json({
@@ -73,9 +73,9 @@ router.post('/login', async (req: Request, res: Response, next) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { sub: user.id, email: user.email },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      { userId: user.id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '24h' }
     );
 
     // Remove password from response
