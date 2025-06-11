@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { ZodError } from 'zod';
 import { logger } from '../config/logger';
 
 export interface AppError extends Error {
@@ -7,31 +8,28 @@ export interface AppError extends Error {
 }
 
 export const errorHandler = (
-  err: AppError,
+  error: any,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  let { statusCode = 500, message } = err;
+  logger.error(error);
 
-  // Log the error
-  logger.error('Error occurred:', {
-    error: err,
-    request: {
-      method: req.method,
-      url: req.url,
-      ip: req.ip,
-    },
-  });
-
-  // Don't leak error details in production
-  if (process.env.NODE_ENV === 'production' && statusCode === 500) {
-    message = 'Internal server error';
+  if (error instanceof ZodError) {
+    return res.status(400).json({
+      error: 'Validation error',
+      details: error.errors
+    });
   }
 
-  res.status(statusCode).json({
-    error: message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+  if (error.code === '23505') { // PostgreSQL unique violation
+    return res.status(409).json({
+      error: 'Resource already exists'
+    });
+  }
+
+  res.status(error.status || 500).json({
+    error: error.message || 'Internal server error'
   });
 };
 

@@ -10,26 +10,12 @@ const trackingService = new UserJobTrackingService();
 
 const createTrackingSchema = z.object({
   jobId: z.string().uuid(),
-  status: z.enum([
-    'interested',
-    'applied',
-    'interviewing',
-    'offer',
-    'rejected',
-    'withdrawn'
-  ] as const),
+  status: z.nativeEnum(ApplicationStatus),
   notes: z.string().optional(),
 });
 
 const updateTrackingSchema = z.object({
-  status: z.enum([
-    'interested',
-    'applied',
-    'interviewing',
-    'offer',
-    'rejected',
-    'withdrawn'
-  ] as const),
+  status: z.nativeEnum(ApplicationStatus),
   notes: z.string().optional(),
 });
 
@@ -74,6 +60,22 @@ router.put('/:jobId', async (req: AuthRequest, res: Response, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+// Add these routes to track job applications
+router.get('/tracking', async (req: AuthRequest, res: Response) => {
+  const userTracking = await trackingService.findAllByUser(req.user!.id);
+  res.json({ userTracking });
+});
+
+router.post('/tracking', async (req: AuthRequest, res: Response) => {
+  const tracking = await trackingService.create({
+    userId: req.user!.id,
+    jobId: req.body.jobId,
+    status: req.body.status,
+    notes: req.body.notes
+  });
+  res.json({ tracking });
 });
 
 export default router; 
